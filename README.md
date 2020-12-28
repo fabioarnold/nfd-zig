@@ -2,7 +2,7 @@
 
 `nfd-zig` is a Zig binding to the library [nativefiledialog](https://github.com/mlabbe/nativefiledialog), that provides a convenient cross-platform interface to opening file dialogs on Linux, macOS and Windows.
 
-For now this library has been tested only on Windows 10.
+For now this library has been tested only on Windows 10 and macOS 11.1.
 
 ## Usage
 

@@ -13,7 +13,16 @@ pub fn makeLib(b: *Builder, mode: builtin.Mode, target: std.zig.CrossTarget, com
     lib.addIncludeDir(prefix ++ "nativefiledialog/src/include");
     lib.addCSourceFile(prefix ++ "nativefiledialog/src/nfd_common.c", &cflags);
     if (lib.target.isDarwin()) {
-        lib.addCSourceFile(prefix ++ "nativefiledialog/src/nfd_cocoa.m", &cflags);
+        // $(xcrun --sdk macosx --show-sdk-path)
+        var compile_objc = b.addSystemCommand(&[_][]const u8{
+            "clang",
+            "-isysroot", "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+            "-I", prefix ++ "nativefiledialog/src/include",
+            "-c", prefix ++ "nativefiledialog/src/nfd_cocoa.m",
+        });
+        lib.addObjectFile("nfd_cocoa.o");
+        lib.step.dependOn(&compile_objc.step);
+        //lib.addCSourceFile(prefix ++ "nativefiledialog/src/nfd_cocoa.m", &cflags);
     } else if (lib.target.isWindows()) {
         lib.addCSourceFile(prefix ++ "nativefiledialog/src/nfd_win.cpp", &cflags);
     } else {
