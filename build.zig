@@ -2,7 +2,7 @@ const std = @import("std");
 const builtin = std.builtin;
 const Builder = std.build.Builder;
 
-pub fn makeLib(b: *Builder, mode: builtin.Mode, target: std.zig.CrossTarget, comptime prefix: []const u8) *std.build.LibExeObjStep {
+pub fn makeLib(b: *Builder, mode: builtin.Mode, target: std.zig.CrossTarget, comptime prefix: []const u8) !*std.build.LibExeObjStep {
     const lib = b.addStaticLibrary("nfd", prefix ++ "src/lib.zig");
     lib.setBuildMode(mode);
     lib.setTarget(target);
@@ -13,10 +13,11 @@ pub fn makeLib(b: *Builder, mode: builtin.Mode, target: std.zig.CrossTarget, com
     lib.addIncludeDir(prefix ++ "nativefiledialog/src/include");
     lib.addCSourceFile(prefix ++ "nativefiledialog/src/nfd_common.c", &cflags);
     if (lib.target.isDarwin()) {
-        // $(xcrun --sdk macosx --show-sdk-path)
+        const sdk_path = try std.zig.system.getSDKPath(b.allocator);
         var compile_objc = b.addSystemCommand(&[_][]const u8{
             "clang",
-            "-isysroot", "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+            "-x", "objective-c",
+            "-isysroot", sdk_path,
             "-I", prefix ++ "nativefiledialog/src/include",
             "-c", prefix ++ "nativefiledialog/src/nfd_cocoa.m",
         });
@@ -46,10 +47,10 @@ pub fn makeLib(b: *Builder, mode: builtin.Mode, target: std.zig.CrossTarget, com
     return lib;
 }
 
-pub fn build(b: *Builder) void {
+pub fn build(b: *Builder) !void {
     const mode = b.standardReleaseOptions();
     const target = b.standardTargetOptions(.{});
-    const lib = makeLib(b, mode, target, "");
+    const lib = try makeLib(b, mode, target, "");
     lib.install();
 
     var demo = b.addExecutable("demo", "src/demo.zig");
