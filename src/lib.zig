@@ -8,7 +8,7 @@ pub const Error = error {
 
 pub fn makeError() Error {
     if (c.NFD_GetError()) |ptr| {
-        log.debug("{}\n", .{
+        log.debug("{s}\n", .{
             std.mem.span(ptr),
         });
     }
