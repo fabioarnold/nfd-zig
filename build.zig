@@ -57,7 +57,7 @@ pub fn build(b: *Builder) !void {
     demo.setBuildMode(mode);
     demo.addPackage(std.build.Pkg{
         .name = "nfd",
-        .path = "src/lib.zig",
+        .path = std.build.FileSource.relative("src/lib.zig"),
     });
     demo.linkLibrary(lib);
     demo.install();

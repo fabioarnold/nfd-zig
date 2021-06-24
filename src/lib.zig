@@ -26,8 +26,8 @@ pub fn openFileDialog(filter: ?[:0]const u8, default_path: ?[:0]const u8) Error!
         &out_path);
 
     return switch (result) {
-        .NFD_OKAY => if (out_path == null) null else std.mem.spanZ(out_path),
-        .NFD_ERROR => makeError(),
+        c.NFD_OKAY => if (out_path == null) null else std.mem.sliceTo(out_path, 0),
+        c.NFD_ERROR => makeError(),
         else => null,
     };
 }
@@ -43,8 +43,8 @@ pub fn saveFileDialog(filter: ?[:0]const u8, default_path: ?[:0]const u8) Error!
         &out_path);
 
     return switch (result) {
-        .NFD_OKAY => if (out_path == null) null else std.mem.spanZ(out_path),
-        .NFD_ERROR => makeError(),
+        c.NFD_OKAY => if (out_path == null) null else std.mem.sliceTo(out_path, 0),
+        c.NFD_ERROR => makeError(),
         else => null,
     };
 }
