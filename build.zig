@@ -38,6 +38,7 @@ pub fn makeLib(b: *Builder, mode: builtin.Mode, target: std.zig.CrossTarget, com
         lib.linkSystemLibrary("ole32");
         lib.linkSystemLibrary("uuid"); // needed by MinGW
     } else {
+        lib.linkSystemLibrary("atk-1.0");
         lib.linkSystemLibrary("gdk-3");
         lib.linkSystemLibrary("gtk-3");
         lib.linkSystemLibrary("glib-2.0");
