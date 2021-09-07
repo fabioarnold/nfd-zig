@@ -13,17 +13,7 @@ pub fn makeLib(b: *Builder, mode: builtin.Mode, target: std.zig.CrossTarget, com
     lib.addIncludeDir(prefix ++ "nativefiledialog/src/include");
     lib.addCSourceFile(prefix ++ "nativefiledialog/src/nfd_common.c", &cflags);
     if (lib.target.isDarwin()) {
-        const sdk_path = try std.zig.system.getSDKPath(b.allocator);
-        var compile_objc = b.addSystemCommand(&[_][]const u8{
-            "clang",
-            "-x", "objective-c",
-            "-isysroot", sdk_path,
-            "-I", prefix ++ "nativefiledialog/src/include",
-            "-c", prefix ++ "nativefiledialog/src/nfd_cocoa.m",
-        });
-        lib.addObjectFile("nfd_cocoa.o");
-        lib.step.dependOn(&compile_objc.step);
-        //lib.addCSourceFile(prefix ++ "nativefiledialog/src/nfd_cocoa.m", &cflags);
+        lib.addCSourceFile(prefix ++ "nativefiledialog/src/nfd_cocoa.m", &cflags);
     } else if (lib.target.isWindows()) {
         lib.addCSourceFile(prefix ++ "nativefiledialog/src/nfd_win.cpp", &cflags);
     } else {
