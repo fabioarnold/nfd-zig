@@ -1,21 +1,20 @@
 # nfd-zig
 
-`nfd-zig` is a Zig binding to the library [nativefiledialog](https://github.com/mlabbe/nativefiledialog), that provides a convenient cross-platform interface to opening file dialogs on Linux, macOS and Windows.
+`nfd-zig` is a Zig binding to the library [nativefiledialog](https://github.com/mlabbe/nativefiledialog) which provides a convenient cross-platform interface to opening file dialogs on Linux, macOS and Windows.
 
 This library has been tested on Windows 10, macOS 11.1 and Linux.
 
 ## Usage
 
-Before building on macOS you need to set an environment variable: `export ZIG_SYSTEM_LINKER_HACK=1`
-You can run a demo with `zig build run`. The source is in `src/demo.zig`.
+You can run a demo with `zig build run`. The demo's source is in `src/demo.zig`.
 
-If you want to add the library to your own project
+If you want to add the library to your own project...
 
 * Add the `nfd` package to your executable in your ```build.zig```
   ```zig
   exe.addPackage(std.build.Pkg{
       .name = "nfd",
-      .path = "deps/nfd-zig/src/lib.zig",
+      .path = std.build.FileSource.relative("deps/nfd-zig/src/lib.zig"),
   });
   ```
 
