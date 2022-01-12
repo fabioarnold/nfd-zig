@@ -50,5 +50,5 @@ pub fn saveFileDialog(filter: ?[:0]const u8, default_path: ?[:0]const u8) Error!
 }
 
 pub fn freePath(path: []const u8) void {
-    std.c.free(@intToPtr(*c_void, @ptrToInt(path.ptr)));
+    std.c.free(@intToPtr(*anyopaque, @ptrToInt(path.ptr)));
 }
