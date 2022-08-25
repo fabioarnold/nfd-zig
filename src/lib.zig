@@ -21,8 +21,8 @@ pub fn openFileDialog(filter: ?[:0]const u8, default_path: ?[:0]const u8) Error!
 
     // allocates using malloc
     const result = c.NFD_OpenDialog(
-        if (filter != null) filter.? else null, 
-        if (default_path != null) default_path.? else null,
+        if (filter != null) filter.?.ptr else null, 
+        if (default_path != null) default_path.?.ptr else null,
         &out_path);
 
     return switch (result) {
@@ -38,8 +38,8 @@ pub fn saveFileDialog(filter: ?[:0]const u8, default_path: ?[:0]const u8) Error!
 
     // allocates using malloc
     const result = c.NFD_SaveDialog(
-        if (filter != null) filter.? else null, 
-        if (default_path != null) default_path.? else null,
+        if (filter != null) filter.?.ptr else null, 
+        if (default_path != null) default_path.?.ptr else null,
         &out_path);
 
     return switch (result) {
@@ -55,7 +55,7 @@ pub fn openFolderDialog(default_path: ?[:0]const u8) Error!?[:0]const u8 {
 
     // allocates using malloc
     const result = c.NFD_PickFolder(
-        if (default_path != null) default_path.? else null,
+        if (default_path != null) default_path.?.ptr else null,
         &out_path);
 
     return switch (result) {
