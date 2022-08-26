@@ -10,7 +10,7 @@ fn sdkPath(comptime suffix: []const u8) []const u8 {
     };
 }
 
-pub fn makeLib(b: *Builder, mode: builtin.Mode, target: std.zig.CrossTarget) !*std.build.LibExeObjStep {
+pub fn makeLib(b: *Builder, mode: builtin.Mode, target: std.zig.CrossTarget) *std.build.LibExeObjStep {
     const lib = b.addStaticLibrary("nfd", sdkPath("/src/lib.zig"));
     lib.setBuildMode(mode);
     lib.setTarget(target);
@@ -51,10 +51,10 @@ pub fn getPackage(name: []const u8) std.build.Pkg {
     };
 }
 
-pub fn build(b: *Builder) !void {
+pub fn build(b: *Builder) void {
     const mode = b.standardReleaseOptions();
     const target = b.standardTargetOptions(.{});
-    const lib = try makeLib(b, mode, target);
+    const lib = makeLib(b, mode, target);
     lib.install();
 
     var demo = b.addExecutable("demo", "src/demo.zig");
