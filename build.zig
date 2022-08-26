@@ -2,22 +2,28 @@ const std = @import("std");
 const builtin = std.builtin;
 const Builder = std.build.Builder;
 
-pub fn makeLib(b: *Builder, mode: builtin.Mode, target: std.zig.CrossTarget, comptime prefix: []const u8) !*std.build.LibExeObjStep {
-    const lib = b.addStaticLibrary("nfd", prefix ++ "src/lib.zig");
+fn sdkPath(comptime suffix: []const u8) []const u8 {
+    if (suffix[0] != '/') @compileError("relToPath requires an absolute path!");
+    return comptime blk: {
+        const root_dir = std.fs.path.dirname(@src().file) orelse ".";
+        break :blk root_dir ++ suffix;
+    };
+}
+
+pub fn makeLib(b: *Builder, mode: builtin.Mode, target: std.zig.CrossTarget) !*std.build.LibExeObjStep {
+    const lib = b.addStaticLibrary("nfd", sdkPath("/src/lib.zig"));
     lib.setBuildMode(mode);
     lib.setTarget(target);
 
-    const cflags = [_][]const u8{
-        "-Wall",
-    };
-    lib.addIncludeDir(prefix ++ "nativefiledialog/src/include");
-    lib.addCSourceFile(prefix ++ "nativefiledialog/src/nfd_common.c", &cflags);
+    const cflags = [_][]const u8{"-Wall"};
+    lib.addIncludeDir(sdkPath("/nativefiledialog/src/include"));
+    lib.addCSourceFile(sdkPath("/nativefiledialog/src/nfd_common.c"), &cflags);
     if (lib.target.isDarwin()) {
-        lib.addCSourceFile(prefix ++ "nativefiledialog/src/nfd_cocoa.m", &cflags);
+        lib.addCSourceFile(sdkPath("/nativefiledialog/src/nfd_cocoa.m"), &cflags);
     } else if (lib.target.isWindows()) {
-        lib.addCSourceFile(prefix ++ "nativefiledialog/src/nfd_win.cpp", &cflags);
+        lib.addCSourceFile(sdkPath("/nativefiledialog/src/nfd_win.cpp"), &cflags);
     } else {
-        lib.addCSourceFile(prefix ++ "nativefiledialog/src/nfd_gtk.c", &cflags);
+        lib.addCSourceFile(sdkPath("/nativefiledialog/src/nfd_gtk.c"), &cflags);
     }
 
     lib.linkLibC();
@@ -38,18 +44,22 @@ pub fn makeLib(b: *Builder, mode: builtin.Mode, target: std.zig.CrossTarget, com
     return lib;
 }
 
+pub fn getPackage(name: []const u8) std.build.Pkg {
+    return std.build.Pkg{
+        .name = name,
+        .source = .{ .path = sdkPath("/src/lib.zig") },
+    };
+}
+
 pub fn build(b: *Builder) !void {
     const mode = b.standardReleaseOptions();
     const target = b.standardTargetOptions(.{});
-    const lib = try makeLib(b, mode, target, "");
+    const lib = try makeLib(b, mode, target);
     lib.install();
 
     var demo = b.addExecutable("demo", "src/demo.zig");
     demo.setBuildMode(mode);
-    demo.addPackage(std.build.Pkg{
-        .name = "nfd",
-        .source = std.build.FileSource.relative("src/lib.zig"),
-    });
+    demo.addPackage(getPackage("nfd"));
     demo.linkLibrary(lib);
     demo.install();
 
