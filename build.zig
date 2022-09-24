@@ -16,7 +16,7 @@ pub fn makeLib(b: *Builder, mode: builtin.Mode, target: std.zig.CrossTarget) *st
     lib.setTarget(target);
 
     const cflags = [_][]const u8{"-Wall"};
-    lib.addIncludeDir(sdkPath("/nativefiledialog/src/include"));
+    lib.addIncludePath(sdkPath("/nativefiledialog/src/include"));
     lib.addCSourceFile(sdkPath("/nativefiledialog/src/nfd_common.c"), &cflags);
     if (lib.target.isDarwin()) {
         lib.addCSourceFile(sdkPath("/nativefiledialog/src/nfd_cocoa.m"), &cflags);
