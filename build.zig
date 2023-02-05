@@ -1,6 +1,5 @@
 const std = @import("std");
 const builtin = std.builtin;
-const Builder = std.build.Builder;
 
 fn sdkPath(comptime suffix: []const u8) []const u8 {
     if (suffix[0] != '/') @compileError("relToPath requires an absolute path!");
@@ -10,7 +9,7 @@ fn sdkPath(comptime suffix: []const u8) []const u8 {
     };
 }
 
-pub fn makeLib(b: *Builder, target: std.zig.CrossTarget, optimize: builtin.OptimizeMode) *std.build.LibExeObjStep {
+pub fn makeLib(b: *std.Build, target: std.zig.CrossTarget, optimize: builtin.OptimizeMode) *std.build.LibExeObjStep {
     const lib = b.addStaticLibrary(.{
         .name = "nfd",
         .root_source_file = .{ .path = sdkPath("/src/lib.zig") },
@@ -47,14 +46,11 @@ pub fn makeLib(b: *Builder, target: std.zig.CrossTarget, optimize: builtin.Optim
     return lib;
 }
 
-pub fn getPackage(name: []const u8) std.build.Pkg {
-    return std.build.Pkg{
-        .name = name,
-        .source = .{ .path = sdkPath("/src/lib.zig") },
-    };
+pub fn getModule(b: *std.Build) *std.build.Module {
+    return b.createModule(.{ .source_file = .{ .path = sdkPath("/src/lib.zig") } });
 }
 
-pub fn build(b: *Builder) void {
+pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
     const lib = makeLib(b, target, optimize);
@@ -66,7 +62,7 @@ pub fn build(b: *Builder) void {
         .target = target,
         .optimize = optimize,
     });
-    demo.addPackage(getPackage("nfd"));
+    demo.addModule("nfd", getModule(b));
     demo.linkLibrary(lib);
     demo.install();
 
