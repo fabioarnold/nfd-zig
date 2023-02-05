@@ -9,7 +9,7 @@ fn sdkPath(comptime suffix: []const u8) []const u8 {
     };
 }
 
-pub fn makeLib(b: *std.Build, target: std.zig.CrossTarget, optimize: builtin.OptimizeMode) *std.build.LibExeObjStep {
+pub fn makeLib(b: *std.Build, target: std.zig.CrossTarget, optimize: builtin.OptimizeMode) *std.build.CompileStep {
     const lib = b.addStaticLibrary(.{
         .name = "nfd",
         .root_source_file = .{ .path = sdkPath("/src/lib.zig") },
