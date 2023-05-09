@@ -40,6 +40,7 @@ pub fn build(b: *std.Build) !void {
         lib.linkSystemLibrary("glib-2.0");
         lib.linkSystemLibrary("gobject-2.0");
     }
+    lib.installHeadersDirectory("nativefiledialog/src/include", ".");
     b.installArtifact(lib);
 
     var demo = b.addExecutable(.{
