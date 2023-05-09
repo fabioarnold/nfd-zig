@@ -2,14 +2,14 @@ const std = @import("std");
 const c = @import("c.zig");
 const log = std.log.scoped(.nfd);
 
-pub const Error = error {
+pub const Error = error{
     NfdError,
 };
 
 pub fn makeError() Error {
     if (c.NFD_GetError()) |ptr| {
         log.debug("{s}\n", .{
-            std.mem.span(ptr),
+            std.mem.sliceTo(ptr, 0),
         });
     }
     return error.NfdError;
@@ -20,10 +20,7 @@ pub fn openFileDialog(filter: ?[:0]const u8, default_path: ?[:0]const u8) Error!
     var out_path: [*c]u8 = null;
 
     // allocates using malloc
-    const result = c.NFD_OpenDialog(
-        if (filter != null) filter.?.ptr else null, 
-        if (default_path != null) default_path.?.ptr else null,
-        &out_path);
+    const result = c.NFD_OpenDialog(if (filter != null) filter.? else null, if (default_path != null) default_path.? else null, &out_path);
 
     return switch (result) {
         c.NFD_OKAY => if (out_path == null) null else std.mem.sliceTo(out_path, 0),
