@@ -63,5 +63,5 @@ pub fn openFolderDialog(default_path: ?[:0]const u8) Error!?[:0]const u8 {
 }
 
 pub fn freePath(path: []const u8) void {
-    std.c.free(@intToPtr(*anyopaque, @ptrToInt(path.ptr)));
+    std.c.free(@ptrFromInt(*anyopaque, @intFromPtr(path.ptr)));
 }
