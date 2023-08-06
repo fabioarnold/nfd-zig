@@ -12,18 +12,20 @@ pub fn build(b: *std.Build) !void {
         .target = target,
         .optimize = optimize,
     });
-    lib.setMainPkgPath(".");
+    lib.main_pkg_path = .{ .path = "." };
     lib.addModule("nfd", nfd);
 
     const cflags = [_][]const u8{"-Wall"};
-    lib.addIncludePath("nativefiledialog/src/include");
-    lib.addCSourceFile("nativefiledialog/src/nfd_common.c", &cflags);
+    lib.addIncludePath(.{ .path = "nativefiledialog/src/include" });
+
+    lib.addCSourceFile(.{ .file = .{ .path = "nativefiledialog/src/nfd_common.c" }, .flags = &cflags });
+
     if (lib.target.isDarwin()) {
-        lib.addCSourceFile("nativefiledialog/src/nfd_cocoa.m", &cflags);
+        lib.addCSourceFile(.{ .file = .{ .path = "nativefiledialog/src/nfd_cocoa.m" }, .flags = &cflags });
     } else if (lib.target.isWindows()) {
-        lib.addCSourceFile("nativefiledialog/src/nfd_win.cpp", &cflags);
+        lib.addCSourceFile(.{ .file = .{ .path = "nativefiledialog/src/nfd_win.cpp" }, .flags = &cflags });
     } else {
-        lib.addCSourceFile("nativefiledialog/src/nfd_gtk.c", &cflags);
+        lib.addCSourceFile(.{ .file = .{ .path = "nativefiledialog/src/nfd_gtk.c" }, .flags = &cflags });
     }
 
     lib.linkLibC();
@@ -49,7 +51,7 @@ pub fn build(b: *std.Build) !void {
         .target = target,
         .optimize = optimize,
     });
-    demo.addIncludePath("nativefiledialog/src/include");
+    demo.addIncludePath(.{ .path = "nativefiledialog/src/include" });
     demo.addModule("nfd", nfd);
     demo.linkLibrary(lib);
     b.installArtifact(demo);
