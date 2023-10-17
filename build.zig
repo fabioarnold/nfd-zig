@@ -9,17 +9,15 @@ pub fn build(b: *std.Build) !void {
     const lib = b.addStaticLibrary(.{
         .name = "nfd",
         .root_source_file = .{ .path = "src/lib.zig" },
+        .main_mod_path = .{ .path = "." },
         .target = target,
         .optimize = optimize,
     });
-    lib.main_pkg_path = .{ .path = "." };
     lib.addModule("nfd", nfd);
 
     const cflags = [_][]const u8{"-Wall"};
     lib.addIncludePath(.{ .path = "nativefiledialog/src/include" });
-
     lib.addCSourceFile(.{ .file = .{ .path = "nativefiledialog/src/nfd_common.c" }, .flags = &cflags });
-
     if (lib.target.isDarwin()) {
         lib.addCSourceFile(.{ .file = .{ .path = "nativefiledialog/src/nfd_cocoa.m" }, .flags = &cflags });
     } else if (lib.target.isWindows()) {
