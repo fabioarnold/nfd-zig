@@ -1,47 +1,42 @@
 const std = @import("std");
 
 pub fn build(b: *std.Build) !void {
-    var target = b.standardTargetOptions(.{});
+    const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    const nfd = b.addModule("nfd", .{ .source_file = .{ .path = "src/lib.zig" } });
-
-    const lib = b.addStaticLibrary(.{
-        .name = "nfd",
+    const nfd_mod = b.addModule("nfd", .{
         .root_source_file = .{ .path = "src/lib.zig" },
-        .main_mod_path = .{ .path = "." },
         .target = target,
         .optimize = optimize,
+        .link_libc = true,
     });
-    lib.addModule("nfd", nfd);
 
     const cflags = [_][]const u8{"-Wall"};
-    lib.addIncludePath(.{ .path = "nativefiledialog/src/include" });
-    lib.addCSourceFile(.{ .file = .{ .path = "nativefiledialog/src/nfd_common.c" }, .flags = &cflags });
-    if (lib.target.isDarwin()) {
-        lib.addCSourceFile(.{ .file = .{ .path = "nativefiledialog/src/nfd_cocoa.m" }, .flags = &cflags });
-    } else if (lib.target.isWindows()) {
-        lib.addCSourceFile(.{ .file = .{ .path = "nativefiledialog/src/nfd_win.cpp" }, .flags = &cflags });
-    } else {
-        lib.addCSourceFile(.{ .file = .{ .path = "nativefiledialog/src/nfd_gtk.c" }, .flags = &cflags });
+    nfd_mod.addIncludePath(.{ .path = "nativefiledialog/src/include" });
+    nfd_mod.addCSourceFile(.{ .file = .{ .path = "nativefiledialog/src/nfd_common.c" }, .flags = &cflags });
+    switch (target.result.os.tag) {
+        .macos => nfd_mod.addCSourceFile(.{ .file = .{ .path = "nativefiledialog/src/nfd_cocoa.m" }, .flags = &cflags }),
+        .windows => nfd_mod.addCSourceFile(.{ .file = .{ .path = "nativefiledialog/src/nfd_win.cpp" }, .flags = &cflags }),
+        .linux => nfd_mod.addCSourceFile(.{ .file = .{ .path = "nativefiledialog/src/nfd_gtk.c" }, .flags = &cflags }),
+        else => @panic("unsupported OS"),
     }
 
-    lib.linkLibC();
-    if (lib.target.isDarwin()) {
-        lib.linkFramework("AppKit");
-    } else if (lib.target.isWindows()) {
-        lib.linkSystemLibrary("shell32");
-        lib.linkSystemLibrary("ole32");
-        lib.linkSystemLibrary("uuid"); // needed by MinGW
-    } else {
-        lib.linkSystemLibrary("atk-1.0");
-        lib.linkSystemLibrary("gdk-3");
-        lib.linkSystemLibrary("gtk-3");
-        lib.linkSystemLibrary("glib-2.0");
-        lib.linkSystemLibrary("gobject-2.0");
+    switch (target.result.os.tag) {
+        .macos => nfd_mod.linkFramework("AppKit", .{}),
+        .windows => {
+            nfd_mod.linkSystemLibrary("shell32", .{});
+            nfd_mod.linkSystemLibrary("ole32", .{});
+            nfd_mod.linkSystemLibrary("uuid", .{}); // needed by MinGW
+        },
+        .linux => {
+            nfd_mod.linkSystemLibrary("atk-1.0", .{});
+            nfd_mod.linkSystemLibrary("gdk-3", .{});
+            nfd_mod.linkSystemLibrary("gtk-3", .{});
+            nfd_mod.linkSystemLibrary("glib-2.0", .{});
+            nfd_mod.linkSystemLibrary("gobject-2.0", .{});
+        },
+        else => @panic("unsupported OS"),
     }
-    lib.installHeadersDirectory("nativefiledialog/src/include", ".");
-    b.installArtifact(lib);
 
     var demo = b.addExecutable(.{
         .name = "nfd-demo",
@@ -50,8 +45,7 @@ pub fn build(b: *std.Build) !void {
         .optimize = optimize,
     });
     demo.addIncludePath(.{ .path = "nativefiledialog/src/include" });
-    demo.addModule("nfd", nfd);
-    demo.linkLibrary(lib);
+    demo.root_module.addImport("nfd", nfd_mod);
     b.installArtifact(demo);
 
     const run_demo_cmd = b.addRunArtifact(demo);
