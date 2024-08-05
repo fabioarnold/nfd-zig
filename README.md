@@ -10,16 +10,19 @@ You can run a demo with `zig build run`. The demo's source is in `src/demo.zig`.
 
 If you want to add the library to your own project...
 
-- Add the `nfd` package to your executable in your `build.zig`
+- Add the `nfd` dependency to your `build.zig.zon`
   ```zig
-  const nfd_build = @import("deps/nfd-zig/build.zig");
-  exe.addPackage(nfd_build.getPackage("nfd"));
+  .{
+    .dependencies = .{
+      .nfd = .{ .path = "libs/nfd-zig" }, // Assuming nfd-zig is available in the local directory. Use .url otherwise.
+    }
+  }
   ```
-- Because `nativefiledialog` is a C library you have to link it to your executable
+- Add the import in your `build.zig`:
   ```zig
-  const nfd_build = @import("deps/nfd-zig/build.zig");
-  const nfd_lib = nfd_build.makeLib(b, mode, target);
-  exe.linkLibrary(nfd_lib);
+  const nfd = b.dependency("nfd", .{});
+  const nfd_mod = nfd.module("nfd");
+  exe.root_module.addImport("nfd", nfd_mod);
   ```
 
 ## Screenshot
