@@ -40,9 +40,11 @@ pub fn build(b: *std.Build) !void {
 
     var demo = b.addExecutable(.{
         .name = "nfd-demo",
-        .root_source_file = b.path("src/demo.zig"),
-        .target = target,
-        .optimize = optimize,
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/demo.zig"),
+            .target = target,
+            .optimize = optimize,
+        }),
     });
     demo.addIncludePath(b.path("nativefiledialog/src/include"));
     demo.root_module.addImport("nfd", nfd_mod);
