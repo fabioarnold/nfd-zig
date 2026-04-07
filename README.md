@@ -18,10 +18,10 @@ If you want to add the library to your own project:
 zig fetch --save git+https://github.com/fabioarnold/nfd-zig.git
 ```
 
-This will add the `nfdzig` dependency to your `build.zig.zon`. e.g.,
+This will add the `nfd` dependency to your `build.zig.zon`. e.g.,
 
 ```zig
-.nfdzig = .{
+.nfd = .{
     .url = "git+https://github.com/fabioarnold/nfd-zig.git#0ad2a0c092ffba0c98613d619b82100c991f5ad6",
     .hash = "nfdzig-0.1.0-11fxvN6IBgD5rvvfjrw1wPqibMsbUJ-h2ZcGR6FOEvrm",
 },
@@ -30,8 +30,8 @@ This will add the `nfdzig` dependency to your `build.zig.zon`. e.g.,
 - Add the module in your `build.zig`:
 
 ```zig
-const nfdzig = b.dependency("nfdzig", .{ .target = target, .optimize = optimize });
-const nfd_mod = nfdzig.module("nfd");
+const nfd = b.dependency("nfd", .{ .target = target, .optimize = optimize });
+const nfd_mod = nfd.module("nfd");
 exe.root_module.addImport("nfd", nfd_mod);
 ```
 
