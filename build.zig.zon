@@ -1,6 +1,6 @@
 .{
-    .name = .nfdzig,
-    .fingerprint = 0x1f85e4a3bcf157d7,
+    .name = .nfd,
+    .fingerprint = 0xc47056586ea4cdcb,
     .version = "0.1.0",
     .minimum_zig_version = "0.15.1",
     .paths = .{
