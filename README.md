@@ -12,7 +12,7 @@ You can run the demo with `zig build run`. The demo's source is in `src/demo.zig
 
 If you want to add the library to your own project:
 
-- Fetch the `nfdzig` dependency:
+- Fetch the `nfd` dependency:
 
 ```bash
 zig fetch --save git+https://github.com/fabioarnold/nfd-zig.git
@@ -23,7 +23,7 @@ This will add the `nfd` dependency to your `build.zig.zon`. e.g.,
 ```zig
 .nfd = .{
     .url = "git+https://github.com/fabioarnold/nfd-zig.git#0ad2a0c092ffba0c98613d619b82100c991f5ad6",
-    .hash = "nfdzig-0.1.0-11fxvN6IBgD5rvvfjrw1wPqibMsbUJ-h2ZcGR6FOEvrm",
+    .hash = "nfd-0.1.0-11fxvN6IBgD5rvvfjrw1wPqibMsbUJ-h2ZcGR6FOEvrm",
 },
 ```
 
