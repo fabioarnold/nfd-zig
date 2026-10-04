@@ -2,7 +2,13 @@
     .name = .nfd,
     .fingerprint = 0xc47056586ea4cdcb,
     .version = "0.1.0",
-    .minimum_zig_version = "0.15.1",
+    .dependencies = .{
+        .translate_c = .{
+            .url = "git+https://codeberg.org/ziglang/translate-c#875969d3493e245e01bf5d7860f792d8f3eb9ef5",
+            .hash = "translate_c-0.0.0-Q_BUWoFOBwAhz77Zd15HCVuhTKzdUKc94kezmCeJ7IC_",
+        },
+    },
+    .minimum_zig_version = "0.17.0",
     .paths = .{
         "nativefiledialog",
         "src",

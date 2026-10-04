@@ -1,14 +1,26 @@
 const std = @import("std");
+const Translator = @import("translate_c").Translator;
 
 pub fn build(b: *std.Build) !void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
+
+    const translate_c = b.dependency("translate_c", .{});
+
+    const nfd_c: Translator = .init(translate_c, .{
+        .c_source_file = b.path("nativefiledialog/src/include/nfd.h"),
+         .target = target,
+         .optimize = optimize,
+     });
 
     const nfd_mod = b.addModule("nfd", .{
         .root_source_file = b.path("src/lib.zig"),
         .target = target,
         .optimize = optimize,
         .link_libc = true,
+        .imports = &.{
+            .{ .name = "nfd_c", .module = nfd_c.mod },
+        }
     });
 
     const cflags = [_][]const u8{"-Wall"};
