@@ -1,7 +1,5 @@
 const std = @import("std");
-const c = @cImport({
-    @cInclude("nfd.h");
-});
+const c = @import("nfd_c");
 const log = std.log.scoped(.nfd);
 
 pub const Error = error{
